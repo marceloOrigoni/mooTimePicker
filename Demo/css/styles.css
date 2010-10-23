@@ -1,0 +1,81 @@
+body{
+	margin: 0px;
+	padding: 0px;
+	text-align: center;
+	font-family: arial;
+	}
+
+.wrap{
+	margin:5px auto;
+	position:relative;
+	width:150px;
+}
+
+.body{
+	float:left;
+	width:150px;
+	margin: 0px;
+}
+	
+input{
+	-moz-border-radius:10px 10px 10px 10px;
+	-webkit-border-radius:10px 10px 10px 10px;
+	border-radius:10px 10px 10px 10px;
+	border:2px solid #999999;
+	float:left;
+	font-size:25px;
+	margin:0 5px;
+	padding:4px;
+	width:100px;
+}
+	
+.timePicker{	
+	float:left;
+	width:120px;
+}
+
+.labels{
+	float:left;
+	font-size:11px;
+	width:120px;
+}
+
+.label{
+	float:left;
+	text-align:center;
+	width:40px;
+}
+
+.sliders{
+	float: left;
+}
+
+.sliders .bar{
+	float: left;
+	width: 9px;
+	margin: 5px 15px;
+	height: 144px;
+	background: url(../img/slider.png) no-repeat;
+	position: relative;
+}
+
+.sliders .bar .knob{
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	background: none;
+	border: none;
+	bottom: 0px;
+	top: 92px;
+	left: -7px;
+	cursor: pointer;
+	background: url(../img/knob.png) top left no-repeat;
+}
+
+.sliders .bar .back{
+	background: url(../img/bg_fill.png) repeat;
+	height: 5px;
+	width: 9px;
+	position: absolute;
+	bottom: 4px;
+}
