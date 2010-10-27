@@ -7,7 +7,7 @@ authors:
   - Marcelo Origoni
 
 version:
-  - 1.0
+  - 1.1
 
 license:
   - MIT-style license
@@ -32,24 +32,31 @@ var mooTimePicker = new Class({
 		minsLabel: 'Minutes',
 		secsLabel: 'Seconds',
 		labelsPosition: 'top',
-		alwaysOn: false
+		alwaysOn: false,
+		showLabels: false,
+		injectInside: ''
 		},
-	initialize: function(element,options){
+	initialize: function(input,options){
 		//Set the options
-		this.setOptions(options);
+		if(MooTools.version >= '1.3'){
+			Object.merge(this.options, options);
+		}else{
+			this.options = $merge(this.options, options);
+		}
 		// Create the variables
-		var hourLabel,minsLabel,secsLabel,labels,hourSlider,minSlider,secSlider,hourKnob,minKnob,secKnob,hourBack,minBack,secBack,container, hours, mins, start, hourSteps, minsSteps, secsSteps, sliders, type, arrayHours, arrayMinutes, arraySeconds,i,h,m,s,startHourStep,startMinStep,startSecStep;
+		var appear,hourLabel,minsLabel,secsLabel,labels,hourSlider,minSlider,secSlider,hourKnob,minKnob,secKnob,hourBack,minBack,secBack,container, hours, mins, start, hourSteps, minsSteps, secsSteps, sliders, type, arrayHours, arrayMinutes, arraySeconds,i,h,m,s,startHourStep,startMinStep,startSecStep;
 		//Create the containters of the sliders
 		container = new Element('div', {'class': 'timePicker'});
 		sliders = new Element('div', {'class': 'sliders'});
 		//Create the labels
-		labels = new Element('div', {'class': 'labels'});
-		hourLabel = new Element('div', {'class': 'label', 'text': this.options.hourLabel});
-		minsLabel = new Element('div', {'class': 'label', 'text': this.options.minsLabel});
-		secsLabel = new Element('div', {'class': 'label', 'text': this.options.secsLabel});
-		hourLabel.inject(labels);
-		minsLabel.inject(labels);
-		secsLabel.inject(labels);
+		if(this.options.showLabels){
+			labels = new Element('div', {'class': 'labels'});
+			hourLabel = new Element('div', {'class': 'label', 'text': this.options.hourLabel});
+			minsLabel = new Element('div', {'class': 'label', 'text': this.options.minsLabel});
+			secsLabel = new Element('div', {'class': 'label', 'text': this.options.secsLabel});
+			hourLabel.inject(labels);
+			minsLabel.inject(labels);
+		}
 		//create the hour Slider, background and knob
 		hourSlider = new Element('div', {'class': 'bar'});hourBack = new Element('div', {'class': 'back'});hourKnob = new Element('div', {'class': 'knob',});
 		//create the minutes Slider, background and knob
@@ -63,18 +70,29 @@ var mooTimePicker = new Class({
 			secSlider = new Element('div', {'class': 'bar'});secBack = new Element('div', {'class': 'back'});secKnob = new Element('div', {'class': 'knob',});
 			secBack.inject(secSlider);secKnob.inject(secSlider);
 			secSlider.inject(sliders);
+			if(this.options.showLabels){
+				secsLabel.inject(labels);
+			}
 		}
-		//inject the sliders and labels inside the container, and the container after the element passed
+		//inject the sliders and labels inside the container, and the container after the input passed
 		sliders.inject(container);
-		labels.inject(container, this.options.labelsPosition);
-		container.inject(element.getParent());
-		//Add the focus/blur event to the element
+		if(this.options.showLabels){
+			labels.inject(container, this.options.labelsPosition);
+		}
+		if(this.options.injectInside){
+			this.options.injectInside = document.id(this.options.injectInside);
+			container.inject(this.options.injectInside);
+		}else{
+			container.inject(input.getParent());			
+		}
+		
+		//Add the focus/blur event to the input
 		if(!this.options.alwaysOn){
-			element.addEvent('focus', function(){var appear = new Fx.Tween(sliders,{duration: 500});appear.start('opacity', '1');});
-			element.addEvent('blur', function(){var appear = new Fx.Tween(sliders,{duration: 500});appear.start('opacity', '0');});
+			input.addEvent('focus', function(){var appear = new Fx.Tween(sliders,{duration: 500});appear.start('opacity', '1');});
+			input.addEvent('blur', function(){var appear = new Fx.Tween(sliders,{duration: 500});appear.start('opacity', '0');});
 		}
 		// Check the Starting value, and set it to 0
-		start = $(element).getProperty('value');
+		start = $(input).getProperty('value');
 		if(!start.contains(':')){
 			if(this.options.secondsSliders){
 				start = '00:00:00';
@@ -181,15 +199,14 @@ var mooTimePicker = new Class({
 			}		
 		//Create the Hours slider
 		hours = new Slider(hourSlider, hourKnob,{
-						snap: true,
+						snap: false,
 						steps: hourSteps - 1,
 						wheel: false,
 						mode: 'vertical',
 						onChange: function(hour){
 							hour = arrayHours[hourSteps - hour - 1];
 							hour < 10 ? hour = '0' + hour : hour = hour;
-							var mins,secs;
-							var time = element.getProperty('value');
+							var mins,secs,time = input.getProperty('value');
 							time = time.split(":");
 							mins = time[1];
 							if(time.length > 2){
@@ -198,22 +215,21 @@ var mooTimePicker = new Class({
 							}else{
 								time = hour + ":" + mins;
 							}
-							element.setProperty('value', time);
+							input.setProperty('value', time);
 							hourBack.setStyle('height', hourSlider.getStyle('height').toInt() - hourKnob.getStyle('top').toInt() - hourKnob.getStyle('height').toInt());
 							}
 						}).set(startHourStep);
 						
 		//Create the Minutes slider
 		mins = new Slider(minSlider, minKnob,{
-						snap: true,
+						snap: false,
 						steps: minsSteps -1,
 						wheel: false,
 						mode: 'vertical',
 						onChange: function(min){
 							min = arrayMinutes[minsSteps - min - 1];
 							min < 10 ? min = '0' + min : min = min;
-							var hour,sec;
-							var time = element.getProperty('value');
+							var hour,sec,time = input.getProperty('value');
 							time = time.split(":");
 							hour = time[0];
 							if(time.length > 2){
@@ -222,7 +238,7 @@ var mooTimePicker = new Class({
 							}else{
 								time = hour + ":" + min;
 							}
-							element.setProperty('value', time);
+							input.setProperty('value', time);
 							minBack.setStyle('height', minSlider.getStyle('height').toInt() - minKnob.getStyle('top').toInt() - minKnob.getStyle('height').toInt());
 							}
 						}).set(startMinStep);
@@ -275,33 +291,39 @@ var mooTimePicker = new Class({
 				}
 			//Create the Seconds slider
 			secs = new Slider(secSlider, secKnob,{
-							snap: true,
+							snap: false,
 							steps: secsSteps - 1,
 							wheel: false,
 							mode: 'vertical',
-							onChange: function(sec){
+							onComplete: function(sec){
 								sec = arraySeconds[secsSteps - sec - 1];
 								sec < 10 ? sec = '0' + sec : sec = sec;
-								var hour,min;
-								var time = element.getProperty('value');
+								var back,hour,min,time = input.getProperty('value');
 								time = time.split(":");
 								hour = time[0];
 								min = time[1];
 								time = hour + ":" + min + ":" + sec;
-								element.setProperty('value', time);
-								secBack.setStyle('height', secSlider.getStyle('height').toInt() - secKnob.getStyle('top').toInt() - secKnob.getStyle('height').toInt());
-								}
+								input.setProperty('value', time);
+								back = secSlider.getStyle('height').toInt() - secKnob.getStyle('top').toInt() - secKnob.getStyle('height').toInt();
+								secBack.setStyle('height', back + 'px');
+								}						
 							}).set(startSecStep);
 		secBack.setStyle('height', secSlider.getStyle('height').toInt() - secKnob.getStyle('top').toInt() - secKnob.getStyle('height').toInt());							
-		}		
+		}
+		this.hours = hours;this.mins = mins;this.hourBack = hourBack;this.hourSlider = hourSlider;this.hourKnob = hourKnob;this.minBack = minBack;this.minSlider = minSlider;this.minKnob = minKnob;		
 		hourBack.setStyle('height', hourSlider.getStyle('height').toInt() - hourKnob.getStyle('top').toInt() - hourKnob.getStyle('height').toInt());
 		minBack.setStyle('height', minSlider.getStyle('height').toInt() - minKnob.getStyle('top').toInt() - minKnob.getStyle('height').toInt());
-		var appear = new Fx.Tween(sliders,{duration: 50});
+		appear = new Fx.Tween(sliders,{duration: 50});
 		if(!this.options.alwaysOn){
 			appear.start('opacity', '0');
 		}
 	},
-	setOptions: function(opts){
-		Object.append(this.options, opts);
+	setSlider: function(input){
+		start = $(input).getProperty('value');
+		if(!start.contains(':')){start = '00:00';}
+		this.hours.set(23 - start.split(':')[0]);
+		this.mins.set(59 - start.split(':')[1]);
+		this.hourBack.setStyle('height', this.hourSlider.getStyle('height').toInt() - this.hourKnob.getStyle('top').toInt() - this.hourKnob.getStyle('height').toInt());
+		this.minBack.setStyle('height', this.minSlider.getStyle('height').toInt() - this.minKnob.getStyle('top').toInt() - this.minKnob.getStyle('height').toInt());		
 	}
 });

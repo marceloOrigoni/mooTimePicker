@@ -7,7 +7,7 @@ How to use
 ----------
 
 	1.	#JS
-		new mooTimePicker(element,options);
+		new mooTimePicker(input,options);
 		element must be an input element
 		options are:
 			secondsSliders: false, 	--> Enables/disables the seconds slider
@@ -18,4 +18,14 @@ How to use
 			minsLabel: 'Minutes',	
 			secsLabel: 'Seconds',	
 			labelsPosition: 'top',	--> Where tp dislay the labels, 'top' or 'bottom'
-			alwaysOn: false			--> sets if the slider are always on, or they fadein/out on focus/blur of the element
+			alwaysOn: false,		--> Sets if the slider are always on, or they fadein/out on focus/blur of the element
+			showLabels: true,		--> Sets if the labels are displayed or not. 
+			injectInside: ''	    --> The element where the sliders will be inject, if blank, the input's parent will be used.
+			
+Changelog:
+----------
+
+V. 1.1		- Added showLabels option.
+			- Added injectInside option.
+			- Fixed bug that showed the seconds label, even if secondSliders was set to false.
+			- Fixed bug that didn't allow to select every minute, when steps was 1 or 2 minutes.
